@@ -316,16 +316,3 @@ class Export: Command {
 
 
 }
-
-class JsonObject(val obj: MutableSet<Person>) {
-
-    override fun toString(): String {
-        return obj.toString()
-    }
-}
-
-//fun json(init: JsonObject.() -> Unit): String {
-//    val obj = JsonObject(mutableSetOf())
-//    obj.init()
-//    return obj.toString()
-//}
