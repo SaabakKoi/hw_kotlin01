@@ -1,3 +1,5 @@
+import java.io.File
+
 fun main(args: Array<String>) {
     var person :Person = Person("")
     var setOfPersons :MutableSet<Person> = mutableSetOf()
@@ -19,6 +21,7 @@ fun main(args: Array<String>) {
                 is AddPhone -> purchase.check(setOfPersons)
                 is AddEmail -> purchase.check(setOfPersons)
                 is Find -> purchase.findContact(setOfPersons)
+                is Export -> purchase.export(setOfPersons)
                 is HelpCommand -> purchase.help()
                 is Exit -> break
                 is Show -> if (person.name!=""){
@@ -79,6 +82,10 @@ fun readCommand(): Command {
     }
     if(splitLine.get(0) == "find"){
         command = Find()
+        return command
+    }
+    if(splitLine.get(0)=="export"){
+        command = Export()
         return command
     }
 
@@ -228,6 +235,7 @@ class HelpCommand : Command {
                     "EXAMPLE: add John phone +7895646 or add John email myEmail@mail.ru \n" +
                     "Command 'addphone' adding phone to contact which was entered \n" +
                     "Command 'addemail' adding email address to contact which was entered\n" +
+                    "Command 'export' exporting all contacts to json type file\n"+
                     "Command 'help' : Showing available commands and their purpose\n" +
                     "Command 'show' : Show last added contact\n" +
                     "Command 'exit' :Exiting from app\n"
@@ -286,3 +294,38 @@ class Show: Command{
     }
 
 }
+
+class Export: Command {
+    override fun isValid(): Boolean {
+        return true
+    }
+
+    fun export(people: MutableSet<Person>) {
+        val json = """
+//            {
+//                "contacts": [
+//                    ${people.joinToString(",\n") { "{\"name\": \"${it.name}\", \"phones\": \"[${it.listOfPhones.toString()}]\", \"emails\": \"[${it.listOfEmails.toString()}]\"}" }}
+//                ]
+//
+//            }
+//        """.trimIndent()
+
+        File("phonebook.json").writeText(json)
+        println("    Export seccessfully complete. Your file phonebook.json.")
+    }
+
+
+}
+
+class JsonObject(val obj: MutableSet<Person>) {
+
+    override fun toString(): String {
+        return obj.toString()
+    }
+}
+
+//fun json(init: JsonObject.() -> Unit): String {
+//    val obj = JsonObject(mutableSetOf())
+//    obj.init()
+//    return obj.toString()
+//}
